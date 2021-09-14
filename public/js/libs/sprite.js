@@ -88,6 +88,7 @@ class Sprite {
         this.y = 0;
         this.scale = 1;
         this.angle = 0;
+        this.z = 0;
 
         this.crop = [0, 0, this.img.width, this.img.height];
 

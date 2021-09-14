@@ -24,7 +24,7 @@ class View {
     }
 
     addChild(child) {
-        this.children.push(spriteThing)
+        this.children.push(child);
     }
 
     /**
@@ -40,12 +40,17 @@ class View {
     }
 
     update() {
+        this.children.sort((a, b) => {
+            return a.z - b.z;
+        })
         for (let i in this.children) {
             this.children[i].update();
             //set this to false per frame to ensure sharp pixels
             this.ctx.imageSmoothingEnabled = false;
             this.children[i].draw(this);
         }
+
+        
     }
 
     /**Draw text */
