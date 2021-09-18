@@ -1,18 +1,17 @@
 var BLEND_TYPE = 'source-over';
-
+_sharedTick = [];
 class AnimRect {
     /**
      * Animation rectangle, used for animating sprites
      * @param initials 
      */
-    constructor(initials = { x: 0, y: 0, width: 0, height: 0 }) {
+    constructor(initials = { x: 0, y: 0, width: 8, height: 8 }) {
         this.current = initials;
         this.animations = {};
 
         this.frame = 0;
         this.timer = 0;
         this.speed = 7;
-        _sharedTick.push(this.update.bind(this));
     }
 
     /**
@@ -109,9 +108,6 @@ class Sprite {
 
         this.depth3D = 1;
 
-        this.flipx = 0;
-        this.flipy = 0;
-
         this.skewx = 0;
         this.skewy = 0;
 
@@ -154,17 +150,18 @@ class Sprite {
         this.blendBuffer = new Renderer();
         this.renderer.setSize(this.img.width, this.img.height);
         this.blendBuffer.setSize(this.img.width, this.img.height);
-        this.renderer.drawImage(this.img, 0, 0, this.img.width, this.img.height, 0, 0, this.img.width, this.img.height)
-        this.blendBuffer.drawImage(this.img, 0, 0, this.img.width, this.img.height, 0, 0, this.img.width, this.img.height)
+        this.renderer.ctx.drawImage(this.img, 0, 0);
+        this.blendBuffer.ctx.drawImage(this.img, 0, 0);
 
         //Instead of using an if statement, we'll just redefine
         //the draw function. initially its blank, but once the
         //image loads, it'll change to this
-        this.draw = function (view) {
+        this.draw = function () {
+    
             if(this.depth3D<=0.1235) return;
             this.blendBuffer.refresh();
-            const ox = Math.round(this.parent.canvas.width / 2 + (this.x / this.depth3D) - (this.parent.x / this.depth3D));
-            const oy = Math.round(this.parent.canvas.height / 2 + (this.y / this.depth3D) - (this.parent.y / this.depth3D));
+            const ox = Math.round(view.canvas.width / 2 + (this.x / this.depth3D) - (view.x / this.depth3D));
+            const oy = Math.round(view.canvas.height / 2 + (this.y / this.depth3D) - (view.y / this.depth3D));
 
             if (this.animation !== null) {
                 this.crop = this.animation.current[this.animation.frame];
@@ -175,21 +172,18 @@ class Sprite {
 
             this.blendBuffer.ctx.save();
             
-            this.blendBuffer.ctx.translate(ox, oy);
             this.blendBuffer.ctx.translate(sx / 2, (sy) / 2);
-            this.blendBuffer.ctx.setTransform(this.flipx + Math.cos(this.r3d[0]), this.skewx, this.skewy, this.flipy + Math.sin(this.r3d[2] + Math.PI / 2), ox, oy)
+            this.blendBuffer.ctx.setTransform(Math.cos(this.r3d[0]), 0, 0, Math.sin(this.r3d[2]+(Math.PI/2)), sx, sy)
             this.blendBuffer.ctx.rotate(this.angle + this.r3d[1]);
             this.blendBuffer.ctx.globalAlpha = this.opacity / 255;
             this.blendBuffer.ctx.translate(-sx / 2, -(sy) / 2);
 
-            this.blendBuffer.ctx.globalCompositeOperation = this.blendMode;
             this.blendBuffer.ctx.drawImage(this.img, this.crop[0], this.crop[1], this.crop[2], this.crop[3], 0, 0, sx, sy);
             this.blendBuffer.ctx.globalAlpha = 1;
            
-            this.blendBuffer.ctx.globalCompositeOperation = 'source-over';
             this.blendBuffer.ctx.restore();
 
-            view.ctx.drawImage(this.blendBuffer.canvas, 0, 0);
+            view.ctx.drawImage(this.blendBuffer.canvas, ox, oy);
         }
     }
 

@@ -16,12 +16,20 @@ Cameras / viewports have the following properties:
  * *  - [height]
  * *  [ctx] (2D)
  * [Functions]
+ * * [drawText(str,x,y)] Debugging, draws text locked to self x/y + defined x/y
+ * * [clear()] Clears the canvas
+ * 
+
+## SceneManager
+ * [Variables/Objects]
+ * * [children] Sprite array[]
+ * * [currentScene] Type of Scene{}
+ * * [sceneStack] Array of Scenes
+ * [Functions]
  * * [addChild(child)] child = any class with an 'update()' and 'draw()' function
  * * [append(where)] Appends the canvas element to the desired location. Default: document.body
  * * [update()] Usually called on its own
- * * [clear()] Clears the canvas
  * * [run()] Starts the loop
- * * [drawText(str,x,y)] Debugging, draws text locked to self x/y + defined x/y
 
 ## Sprite API:
 
