@@ -167,18 +167,21 @@ class Sprite {
                 this.crop = this.animation.current[this.animation.frame];
             }
 
-            const sx = this.crop[2] * (this.scale / this.depth3D);
-            const sy = this.crop[3] * (this.scale / this.depth3D)
+            const sx = this.crop[2];
+            const sy = this.crop[3];
+
+            const psx = sx*(this.scale / this.depth3D);
+            const psy = sy*(this.scale / this.depth3D);
 
             this.blendBuffer.ctx.save();
             
-            this.blendBuffer.ctx.translate(sx / 2, (sy) / 2);
+            this.blendBuffer.ctx.translate(psx / 2, (psy) / 2);
             this.blendBuffer.ctx.setTransform(Math.cos(this.r3d[0]), 0, 0, Math.sin(this.r3d[2]+(Math.PI/2)), sx, sy)
             this.blendBuffer.ctx.rotate(this.angle + this.r3d[1]);
             this.blendBuffer.ctx.globalAlpha = this.opacity / 255;
-            this.blendBuffer.ctx.translate(-sx / 2, -(sy) / 2);
+            this.blendBuffer.ctx.translate(-psx / 2, -(psy) / 2);
 
-            this.blendBuffer.ctx.drawImage(this.img, this.crop[0], this.crop[1], this.crop[2], this.crop[3], 0, 0, sx, sy);
+            this.blendBuffer.ctx.drawImage(this.img, this.crop[0], this.crop[1], this.crop[2], this.crop[3], 0, 0, psx, psy);
             this.blendBuffer.ctx.globalAlpha = 1;
            
             this.blendBuffer.ctx.restore();

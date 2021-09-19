@@ -81,7 +81,7 @@ class Input {
 
   static hold(w) {
     try {
-      return this.finalInput[this.aliasGamepad[w]].tap >= 1;
+      return this.finalInput[w].tap >= 1;
     } catch {
       return false;
     }

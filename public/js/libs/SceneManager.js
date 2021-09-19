@@ -11,6 +11,15 @@ class Scene {
     addChild(child = Sprite) {
         this.children.push(child);
         child.parent = this;
+        child.id = this.children.length-1;
+    }
+
+    removeChild(child) {
+        for(let i=0;i<this.children.length;i++) {
+            if(child == this.children[i]) {
+                this.children.splice(i, 1);
+            }
+        }
     }
 
     update() {
@@ -20,12 +29,13 @@ class Scene {
         })
         for (let i in this.children) {
             try {
-                this.children[i].update();
-                //set this to false per frame to ensure sharp pixels
-                this.children[i].draw();
-
+                if (this.children[i]) {
+                    this.children[i].update();
+                    this.children[i].draw();
+                    // console.log(this.children)
+                }
             } catch (e) {
-                console.log(e);
+                // console.log(e);
             }
         }
     }
