@@ -1,4 +1,4 @@
-const ImgPreloadArray = ['/img/font.png', '/img/sprites/default.png', '/img/patterns/wood.png','/img/sprites/pico8_invaders_sprites.png'];
+const ImgPreloadArray = ['/img/font.png','/img/sprites/pico8_invaders_sprites.png'];
 const ImgPreload = {};
 ImgPreloadArray.forEach((a, b) => {
     const src = new Image();

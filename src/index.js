@@ -1,15 +1,38 @@
+const createError = require('http-errors')
 const express = require('express')
-const app = express()
-const logger = require('morgan')
 const path = require('path')
-const port = 3000
+const cookieParser = require('cookie-parser')
+const logger = require('morgan')
+
+const verifyUser = require('./middleware/verify-user')
+
+const indexRoutes = require('./routes')
+const userRoutes = require('./routes/user')
+
+const app = express()
+
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'twig')
+
 app.use(logger('dev'))
-app.use(express.static('public'))
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
+app.use(cookieParser())
+app.use(express.static(path.join(__dirname, 'public')))
 
-app.get('/', function(res) {
-  res.sendFile(path.join(__dirname + '/index.html'))
+app.use('/', indexRoutes)
+app.use('/users', verifyUser, userRoutes)
+
+app.use(function(req, res, next) {
+  next(createError(404))
 })
 
-app.listen(port, function() {
-  console.log('Listening on http://localhost:' + port)
+app.use(function(err, req, res, next) {
+  res.locals.message = err.message
+  res.locals.error = req.app.get('env') === 'development' ? err : {}
+
+  res.status(err.status || 500)
+  res.render('error')
 })
+
+module.exports = app

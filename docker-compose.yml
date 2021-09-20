@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass1234
+      MONGO_INITDB_DATABASE: gaem
+    ports:
+      - "27017:27017"
+    container_name: gaem_db
