@@ -11,12 +11,12 @@ class Scene {
     addChild(child = Sprite) {
         this.children.push(child);
         child.parent = this;
-        child.id = this.children.length-1;
+        child.id = this.children.length - 1;
     }
 
     removeChild(child) {
-        for(let i=0;i<this.children.length;i++) {
-            if(child == this.children[i]) {
+        for (let i = 0; i < this.children.length; i++) {
+            if (child == this.children[i]) {
                 this.children.splice(i, 1);
             }
         }
@@ -51,7 +51,8 @@ class _SceneManager {
         this.sceneStack = [];
         this.currentScene = new Scene();
         this.fps = 60;
-        this.targetmsfps = Math.round(1000 / this.fps);
+        this.targetmsfps = (1000 / this.fps);
+        this.lastTime = Date.now();
         this.isRunning = false;
 
         this.debug = {
@@ -70,31 +71,29 @@ class _SceneManager {
         this.currentScene = this.sceneStack[this.sceneStack.length - 1];
     }
 
+    pop() {
+        this.sceneStack.pop();
+        this.currentScene = this.sceneStack[this.sceneStack.length - 1];
+    }
+
+    clean() {
+        this.sceneStack.splice(0, this.sceneStack.length);
+        this.currentScene = new Scene();
+    }
+
     update() {
         try {
             if (this.isRunning) requestAnimationFrame(this.update.bind(this));
-            Input.updateInput();
-            const now = new Date().getTime();
-            const delta = now - this.debug.renTime;
+            let now = (new Date()).getTime();
+            this.delta = (now-this.lastTime);
 
-            this.debug.new_rentime = Date.now();
-
-
-            if (delta > this.targetmsfps) {
+            if(this.delta > this.targetmsfps) {
+                Input.updateInput();
                 this.mainView.clear();
-                if (this.debug.on) {
-                    this.debug.ticker++;
-                    this.debug.ticker = this.debug.ticker % 31;
-                    if (this.debug.ticker == 30) {
-                        this.debug.responseTime = Math.floor(this.debug.new_rentime - this.debug.old_rentime);
-                        this.debug.renTime = now - (delta % this.targetmsfps);
-                        this.debug.old_rentime = Date.now();
-                    }
-                    this.mainView.drawText(`${Math.floor((this.debug.new_rentime / this.debug.old_rentime) * this.fps)}FPS`, 0, 0)
-                }
                 this.currentScene.update();
-
+                this.lastTime = now - (this.delta % this.targetmsfps);
             }
+
         } catch (e) {
             //Something went wrong, lets stop
             //processing it
@@ -103,13 +102,35 @@ class _SceneManager {
         }
     }
 
+    render() {
+
+    }
+
     run(mainView) {
         this.isRunning = true;
         this.mainView = mainView;
-        this.update();
+        this.update(Date.now());
     }
 
     stop() {
         this.isRunning = false;
     }
 } const SceneManager = new _SceneManager();
+
+var lastTime;
+var requiredElapsed = 1000 / 100; // desired interval is 10fps
+
+requestAnimationFrame(loop);
+
+function loop(now) {
+    requestAnimationFrame(loop);
+
+    if (!lastTime) { lastTime = now; }
+    var elapsed = lastTime - now;
+
+    if (elapsed > requiredElapsed) {
+        console.log('what');
+        lastTime = now;
+    }
+
+}

@@ -16,13 +16,16 @@ PlayerShot.addSequence('default', [
 ]);
 PlayerShot.setSequence('default');
 
+
+
 class Bullet extends Sprite {
-    constructor(x=0, y=0, hvel=0) {
+    constructor(x = 0, y = 0, hvel = 0) {
         super('/img/sprites/pico8_invaders_sprites.png');
         this.setAnimation(PlayerShot);
 
         this.life = 60;
         this.lifeCounter = 0;
+        this.blendMode = 'hue';
 
         this.moveSpeed = 4;
 
@@ -31,31 +34,18 @@ class Bullet extends Sprite {
 
         this.scale = 0.5;
 
-        this.hvel = Math.round(hvel)/2;
+        this.hvel = Math.round(hvel) / 2;
     }
 
-    update() {
+    async update() {
         this.y -= this.moveSpeed;
         this.x += this.hvel;
         this.lifeCounter++;
 
-        if(this.y<-view.canvas.height/2) {
-            this.y-=((view.canvas.height/2)+this.y);
-            this.moveSpeed = -this.moveSpeed/4;
-            this.hvel = Math.random()*this.hvel - Math.random()*this.hvel;
-        }
-
-        if(this.x<-view.canvas.width/2) {
-            this.hvel = -this.hvel/2;
-        }
-
-        if(this.x>view.canvas.width/2) {
-            this.hvel = -this.hvel/2;
-        }
-
-        this.r3d[0] = (this.y/(Math.PI*2))+this.moveSpeed;
-        this.r3d[1] = ((this.x+this.y)/(Math.PI*3));
-        this.r3d[3] = (this.y/(Math.PI*4));
+        this.r3d[0] = (this.lifeCounter / (Math.PI * 24)) + this.moveSpeed;
+        this.r3d[1] = ((this.x + this.lifeCounter) / (Math.PI * 4));
+        this.r3d[3] = (this.lifeCounter / (Math.PI * 24));
+        this.scale = Math.cos(this.lifeCounter / (Math.PI * 90));
         if (this.lifeCounter >= this.life) {
             this.parent.removeChild(this);
         }
@@ -71,11 +61,11 @@ const Player = new class extends Sprite {
         this.spawnTimer = {
             self: 5,
             bullet: 5,
-            tick:0
+            tick: 0
         }
     }
 
-    update() {
+    async update() {
         let moveSpeed = (Input.hold('lb')) ? this.moveSpeed / 2 : this.moveSpeed;
         moveSpeed *= (Input.hold('rb')) ? 2 : 1;
         this.x += (Math.abs(Input.axes(0)) > 0.1) ? Math.sin(Input.axes(0) * Math.PI / 2) * moveSpeed : 0;
@@ -86,9 +76,9 @@ const Player = new class extends Sprite {
 
         if (Input.hold('a')) {
             this.spawnTimer.tick++;
-            if(this.spawnTimer.tick>this.spawnTimer.bullet) {
-                const shots = 5;
-                for(let i=-shots/2;i<shots/2;i++) {
+            if (this.spawnTimer.tick > this.spawnTimer.bullet) {
+                const shots = 1;
+                for (let i = -shots / 2; i < shots / 2; i++) {
                     const f = new Bullet(this.x, this.y, i);
                     SceneManager.currentScene.addChild(f);
                     this.spawnTimer.tick = 0;
@@ -104,14 +94,86 @@ class Scene_Boot extends Scene {
         super();
     }
 
-    setup() {
-        this.addChild(Player);
-        console.log(Player)
+    async setup() {
+        this.particleTest = new ParticleSprite(view.canvas.width, view.canvas.height);
+        this.particleTest.setRule('offscreen', true);
+
+
+        this.addChild(this.particleTest);
+
+        this.prepareTypewrite();
     }
 
-    update() {
+    async update() {
         super.update();
-        PlayerSprite.update();
+        // PlayerSprite.update();
+    }
+
+    prepareTypewrite() {
+        this.word = `Produced by $c[rgb(255,255,0)]HJD$c[n]`;
+        this.letters = [];
+        this.progress = 0;
+        this.openText = new openSprite(view.canvas.width, view.canvas.height, self => {
+            this.type(self);
+        })
+        this.openText.x = (view.canvas.width / 2)
+        this.addChild(this.openText);
+
+        this.wordPrep = this.openText.string(this.word);
+    }
+
+    type(self) {
+        const newX = (view.canvas.width / 2) - (this.letters.length * 3);
+        self.x += (newX - self.x) / 4;
+        this.progress++;
+        if (this.progress > 5 && this.letters.length < this.wordPrep.length) {
+            self.y = view.canvas.height / 2 - 3;
+            this.progress = 0;
+            this.letters.push(this.wordPrep[this.letters.length])
+             for (let i = 0; i < 5; i++) {
+                const star_vel = this.particleTest.randomVelocity2D(1);
+                const life = 30 + Math.random() * 60;
+                
+                this.particleTest.newParticle({
+                    position: [self.x+Math.random() * (this.letters.length*6), self.y+3+-(Math.random() * 6)],
+                    opacity: 1,
+                    fadeVelocity: 1 / life,
+                    velocity: star_vel,
+                    life: life,
+                    rotationalVelocity: this.particleTest.randomVelocity3D(1),
+                    blendMode: 'source-over',
+                    color: `rgba(10, 150, 255, ${0.5 + Math.random() / 2})`
+                });
+            }
+        }
+
+        if(this.progress == 10) {
+            for (let i = 0; i < 100; i++) {
+                const star_vel = this.particleTest.randomVelocity2D(1);
+                const life = 30 + Math.random() * 60;
+                
+                this.particleTest.newParticle({
+                    position: [self.x+Math.random() * (this.letters.length*6), self.y+3+-(Math.random() * 6)],
+                    opacity: 1,
+                    fadeVelocity: 1 / life,
+                    velocity: star_vel,
+                    life: life,
+                    rotationalVelocity: this.particleTest.randomVelocity3D(1),
+                    blendMode: 'source-over',
+                    color: `rgba(255, 255, 255, 1)`
+                });
+            }
+        }
+
+        if (this.progress > 180) {
+            self.opacity -= 5;
+            self.y -= Math.cos(self.opacity / 164);
+        }
+        self.drawText(this.letters, 0, 0);
+
+        if (this.progress > 280) {
+
+        }
     }
 };
 

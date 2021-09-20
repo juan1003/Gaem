@@ -12,9 +12,9 @@ class View {
      * @param config 
      */
     constructor(config = {
-        width: 284,
+        width: 427,
         // width: 640,
-        height: 160
+        height: 240
         // height: 360
     }) {
         this.canvas = document.createElement('canvas');
