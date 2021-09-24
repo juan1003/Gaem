@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
+    "dev": "DEBUG=gaem:* npm start",
     "start": "node bin/www"
   },
   "keywords": [],
