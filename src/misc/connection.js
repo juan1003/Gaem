@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 module.exports = function () {
-    mongoose.connect('mongodb://root:pass1234@localhost:27017')
+    mongoose.connect('mongodb://root:pass1234@localhost:27017/gaem')
 
     const Ship = mongoose.model('Ship', {
         name: String,

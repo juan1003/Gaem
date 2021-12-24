@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: ./Dockerfile
     environment:
-      MONGO_URI: mongo://root:pass1234@mongo:27017/gaem
+      MONGO_URI: mongodb://root:pass1234@mongo:27017/gaem
     volumes:
       - .:/var/www
     ports:
