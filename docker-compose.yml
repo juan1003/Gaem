@@ -1,7 +1,21 @@
 version: "3"
 
 services:
-  db:
+  app:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      MONGO_URI: mongo://root:pass1234@mongo:27017/gaem
+    volumes:
+      - .:/var/www
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    container_name: gaem_app
+
+  mongo:
     image: mongo
     restart: always
     environment:
