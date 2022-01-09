@@ -5,8 +5,8 @@ services:
     build: 
       context: .
       dockerfile: ./Dockerfile
-    environment:
-      MONGO_URI: mongodb://root:pass1234@mongo:27017/gaem
+    env_file:
+      - .env
     volumes:
       - .:/var/www
     ports:
@@ -19,9 +19,8 @@ services:
     image: mongo
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: pass1234
-      MONGO_INITDB_DATABASE: gaem
     ports:
       - "27017:27017"
     container_name: gaem_db
