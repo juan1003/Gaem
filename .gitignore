@@ -5,3 +5,4 @@ node_modules/
 .env
 npm-error.log
 yarn-error.log
+*.log
