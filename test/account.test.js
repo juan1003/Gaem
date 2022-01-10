@@ -2,12 +2,14 @@ const { hash } = require('bcrypt')
 const accountRepository = require('../src/repositories/account')
 
 describe('User repos', () => {
-    let accounts;
+    let account1, accounts, hashedPassword;
 
     beforeEach(async () => {
-        await accountRepository.add({
+        hashedPassword = await hash('pass1234', 15)
+
+        account1 = await accountRepository.add({
             username: 'jdejesus',
-            password: 'pass1234'
+            password: hashedPassword
         })
 
         accounts = await accountRepository.get()
