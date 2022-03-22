@@ -7,7 +7,7 @@ const logger = require('morgan')
 const verifyUser = require('./middleware/verify-user')
 
 const indexRoutes = require('./routes')
-const userRoutes = require('./routes/user')
+const userRoutes = require('./routes/account')
 
 const app = express()
 

@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const userRepository = require('../repositories/user')
+const userRepository = require('../repositories/account')
 
 router.post('/register', async function (req, res) {
     const { user } = req.body
